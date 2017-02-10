@@ -56,6 +56,8 @@ $Key = Get-Content $KeyFilePath
 $credXML = Import-Clixml $CredPath #Import encrypted credential file into XML format
 $secureStringPWD = ConvertTo-SecureString -String $credXML.Password -Key $key
 $Credentials = New-Object System.Management.Automation.PsCredential($credXML.UserName, $secureStringPWD) # Create PScredential Object
+$ErrorActionPreference = 'SilentlyContinue'
+$TargetSGusers = Get-ADGroupMember $TargetGroupAgenda | select -ExpandProperty samaccountname
 
 get-pssession | remove-pssession
 Connect-EXOnline -Credentials $Credentials
@@ -79,16 +81,20 @@ If ($TargetUserAgenda -notlike $null) {
 } # End If TargetUserAgenda -notlike $Null
 
 If ($TargetGroupAgenda -notlike $null) {
-    ForEach ($MB in $TargetGroupAgenda) { # Go through each MailBox in the target user group
-        Write-Output "Current Agenda permissions of target agenda:"
-        Get-MailboxFolderPermission -Identity ("$TargetGroupAgenda" + ":\Agenda")
+    ForEach ($MB in $TargetSGusers) { # Go through each MailBox in the target user group
+        #$users = get-MailboxFolderPermission -Identity ("$MB" + ":\Agenda") | select -ExpandProperty user
+      #  ForEach ($user in $users) {
 
-        If ($Action -like "Add") {
-            add-MailboxFolderPermission -Identity ("$MB" + ":\Agenda") -User $NeedAccessMB -AccessRights $AccessRightsRole -Confirm:$False #-whatif # werkt
-        }
-        If ($Action -like "Remove") {
-            Remove-MailboxFolderPermission -Identity ("$MB" + ":\Agenda") -User $NeedAccessMB -Confirm:$False #-whatif # werkt   
-        }
+            Write-Output "Current Agenda permissions of target agenda:"
+            Get-MailboxFolderPermission -Identity ("$MB" + ":\Agenda")
+
+            If ($Action -like "Add") {
+                add-MailboxFolderPermission -Identity ("$MB" + ":\Agenda") -User $NeedAccessMB -AccessRights $AccessRightsRole -Confirm:$False -ea silentlycontinue #-whatif # werkt
+            }
+            If ($Action -like "Remove") {
+                Remove-MailboxFolderPermission -Identity ("$MB" + ":\Agenda") -User $NeedAccessMB -Confirm:$False #-whatif # werkt   
+            }
+       # } # End ForEach
     } # End ForEach
     Write-Output "Current Agenda permissions of target agenda after change:"
     Get-MailboxFolderPermission -Identity ("$TargetUserAgenda" + ":\Agenda")
