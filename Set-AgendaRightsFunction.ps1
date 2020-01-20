@@ -14,15 +14,15 @@
     Login account for Exchange Online
     Encrypted Key and Credential file for unattended use     
 .EXAMPLE
-    .\Set-AgendaRightsFunction.ps1 -credpath "c:\beheer\scripts\key\saMSPstackcreds.xml" -KeyFilePath "C:\beheer\scripts\key\ClientExchangeOnline.key" -TargetUserAgenda demo03@test.nl -AccessRightsRole Reviewer -NeedAccessMB demo02@test.nl -Action Add
+    .\Set-AgendaRightsFunction.ps1 -credpath "\creds.xml" -KeyFilePath "\Online.key" -TargetUserAgenda demo03@test.nl -AccessRightsRole Reviewer -NeedAccessMB demo02@test.nl -Action Add
 #>
 [CmdletBinding()]
 param (
         [Parameter(Mandatory=$False)] # O365 specific value, Path to XML file that includes customer Office 365 Service Account credentials
-        [string]$CredPath, # "c:\beheer\scripts\key\saMSPstackcreds.xml"
+        [string]$CredPath, # "creds.xml"
 
         [Parameter(Mandatory=$False)] # 0365 specific value, Path to AES key file that can de-crypt the XML file containing Office 365 SA credentials
-        [string]$KeyFilePath, # "C:\beheer\scripts\key\ClientExchangeOnline.key"
+        [string]$KeyFilePath, # "Online.key"
         
         [Parameter(Mandatory=$False)] # UPN of user whose agenda needs to be changes
         [string]$TargetUserAgenda, # "test@test.nl"
